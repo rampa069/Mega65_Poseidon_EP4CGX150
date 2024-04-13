@@ -107,33 +107,34 @@ end sid6581;
 architecture Behavioral of sid6581 is
   
   component sid_voice_8580 is port (
-    ce_1m			: in	std_logic;
-    clock : in std_logic;
-    cpuclock : in std_logic;
-    sawtooth : in unsigned(11 downto 0);
-    triangle : in unsigned(11 downto 0);
-    st_out : in unsigned(7 downto 0);
-    p_t_out : in unsigned(7 downto 0);
-    ps_out : in unsigned(7 downto 0);
-    pst_out : in unsigned(7 downto 0);
-    reset			: in	std_logic;
-    Freq_lo			: in	unsigned(7 downto 0);	-- low-byte of frequency register 
-    Freq_hi			: in	unsigned(7 downto 0);	-- high-byte of frequency register 
-    Pw_lo				: in	unsigned(7 downto 0);	-- low-byte of PuleWidth register
-    Pw_hi				: in	unsigned(7 downto 0);	-- high-nibble of PuleWidth register
-    Control			: in	unsigned(7 downto 0);	-- control register
-    Att_dec			: in	unsigned(7 downto 0);	-- attack-deccay register
-    Sus_Rel			: in	unsigned(7 downto 0);	-- sustain-release register
-    osc_MSB_in		: in	std_logic;		        					-- Phase Accumulator MSB input
-    osc_MSB_out		: out	std_logic;							-- Phase Accumulator MSB output
-    Osc_out				: out	unsigned(7 downto 0);	-- Voice waveform register
-    Env_out				: out	unsigned(7 downto 0);	-- Voice envelope register
-    signal_out			: out	unsigned(11 downto 0)	-- Voice waveform, this is the actual audio signal
-	);
-  end component;
+        cpuclock  : in  std_logic;
+        clock     : in  std_logic;
+        ce_1m     : in  std_logic;
+        reset     : in  std_logic;
+        freq_lo   : in  unsigned(7 downto 0);
+        freq_hi   : in  unsigned(7 downto 0);
+        pw_lo     : in  unsigned(7 downto 0);
+        pw_hi     : in  unsigned(7 downto 0);
+        control   : in  unsigned(7 downto 0);
+        att_dec   : in  unsigned(7 downto 0);
+        sus_rel   : in  unsigned(7 downto 0);
+        osc_msb_in: in  std_logic;
 
-	 
-	 
+        st_out    : in  unsigned(7 downto 0);
+        p_t_out   : in  unsigned(7 downto 0);
+        ps_out    : in  unsigned(7 downto 0);
+        pst_out   : in  unsigned(7 downto 0);
+
+        sawtooth  : 		out unsigned(11 downto 0);
+        supersawtooth: 	out unsigned(11 downto 0);
+        triangle  : 		out unsigned(11 downto 0);
+
+        osc_msb_out: out std_logic;
+        signal_out : out unsigned(11 downto 0);
+        osc_out    : out unsigned(7 downto 0);
+        env_out    : out unsigned(7 downto 0)
+    );
+  end component;
   
   signal reset_drive : std_logic;
   
@@ -310,83 +311,86 @@ begin
       voice					=> voice_3
       );
   
---  sid_voice_8580_1: entity work.sid_voice_8580
---    port map(
---      cpuclock => cpuclock,
---      clock                           => clk_1Mhz,
---      ce_1m				=> clk_1MHz_en,
---      reset					=> reset_drive,
---      Freq_lo				=> Voice_1_Freq_lo,
---      Freq_hi				=> Voice_1_Freq_hi,
---      Pw_lo					=> Voice_1_Pw_lo,
---      Pw_hi					=> Voice_1_Pw_hi,
---      Control				=> Voice_1_Control,
---      Att_dec				=> Voice_1_Att_dec,
---      Sus_Rel				=> Voice_1_Sus_Rel,
---      osc_MSB_in			=> voice_3_PA_MSB_8580,
---      osc_MSB_out			=> voice_1_PA_MSB_8580,
---      sawtooth                        => voice_1_sawtooth_8580,
---      triangle                        => voice_1_triangle_8580,
---      st_out                          => voice_1_st_out_8580,
---      p_t_out                         => voice_1_p_t_out_8580,
---      ps_out                         => voice_1_ps_out_8580,
---      pst_out                         => voice_1_pst_out_8580,
-----		Osc					=> open,
-----		Env					=> open,
---      signal_out					=> voice_1_8580
---      );
---  
---  sid_voice_8580_2: entity work.sid_voice_8580
---    port map(
---      cpuclock => cpuclock,
---      clock                           => clk_1Mhz,
---      ce_1m				=> clk_1MHz_en,
---      reset					=> reset_drive,
---      Freq_lo				=> Voice_2_Freq_lo,
---      Freq_hi				=> Voice_2_Freq_hi,
---      Pw_lo					=> Voice_2_Pw_lo,
---      Pw_hi					=> Voice_2_Pw_hi,
---      Control				=> Voice_2_Control,
---      Att_dec				=> Voice_2_Att_dec,
---      Sus_Rel				=> Voice_2_Sus_Rel,
---      osc_MSB_in			=> voice_1_PA_MSB_8580,
---      osc_MSB_out			=> voice_2_PA_MSB_8580,
---      sawtooth                        => voice_2_sawtooth_8580,
---      triangle                        => voice_2_triangle_8580,
---      st_out                          => voice_2_st_out_8580,
---      p_t_out                         => voice_2_p_t_out_8580,
---      ps_out                         => voice_2_ps_out_8580,
---      pst_out                         => voice_2_pst_out_8580,
-----		Osc					=> open,
-----		Env					=> open,
---      signal_out					=> voice_2_8580
---      );
---  
---  sid_voice_8580_3: entity work.sid_voice_8580
---    port map(
---      cpuclock => cpuclock,
---      clock                           => clk_1Mhz,
---      ce_1m				=> clk_1MHz_en,
---      reset					=> reset_drive,
---      Freq_lo				=> Voice_3_Freq_lo,
---      Freq_hi				=> Voice_3_Freq_hi,
---      Pw_lo					=> Voice_3_Pw_lo,
---      Pw_hi					=> Voice_3_Pw_hi,
---      Control				=> Voice_3_Control,
---      Att_dec				=> Voice_3_Att_dec,
---      Sus_Rel				=> Voice_3_Sus_Rel,
---      osc_MSB_in			=> voice_2_PA_MSB_8580,
---      osc_MSB_out			=> voice_3_PA_MSB_8580,
---      sawtooth                        => voice_3_sawtooth_8580,
---      triangle                        => voice_3_triangle_8580,
---      st_out                          => voice_3_st_out_8580,
---      p_t_out                         => voice_3_p_t_out_8580,
---      ps_out                         => voice_3_ps_out_8580,
---      pst_out                         => voice_3_pst_out_8580,
---      Osc_out					=> Misc_Osc3_Random_8580,
---      Env_out					=> Misc_Env3_8580,
---      signal_out					=> voice_3_8580
---      );
+ --sid_voice_8580_1: entity work.sid_voice_8580
+   sid_voice_8580_1 : component sid_voice_8580
+   port map(
+     cpuclock => cpuclock,
+     clock              => clk_1Mhz,
+     ce_1m				   => clk_1MHz_en,
+     reset					=> reset_drive,
+     Freq_lo				=> Voice_1_Freq_lo,
+     Freq_hi				=> Voice_1_Freq_hi,
+     Pw_lo					=> Voice_1_Pw_lo,
+     Pw_hi					=> Voice_1_Pw_hi,
+     Control				=> Voice_1_Control,
+     Att_dec				=> Voice_1_Att_dec,
+     Sus_Rel				=> Voice_1_Sus_Rel,
+     osc_MSB_in			=> voice_3_PA_MSB_8580,
+     osc_MSB_out			=> voice_1_PA_MSB_8580,
+     sawtooth           => voice_1_sawtooth_8580,
+     triangle           => voice_1_triangle_8580,
+     st_out             => voice_1_st_out_8580,
+     p_t_out            => voice_1_p_t_out_8580,
+     ps_out             => voice_1_ps_out_8580,
+     pst_out            => voice_1_pst_out_8580,
+--		Osc					=> open,
+--		Env					=> open,
+     signal_out			=> voice_1_8580
+     );
+ 
+ --sid_voice_8580_2: entity work.sid_voice_8580
+ sid_voice_8580_2 : component sid_voice_8580
+   port map(
+     cpuclock => cpuclock,
+     clock              => clk_1Mhz,
+     ce_1m				   => clk_1MHz_en,
+     reset					=> reset_drive,
+     Freq_lo				=> Voice_2_Freq_lo,
+     Freq_hi				=> Voice_2_Freq_hi,
+     Pw_lo					=> Voice_2_Pw_lo,
+     Pw_hi					=> Voice_2_Pw_hi,
+     Control				=> Voice_2_Control,
+     Att_dec				=> Voice_2_Att_dec,
+     Sus_Rel				=> Voice_2_Sus_Rel,
+     osc_MSB_in			=> voice_1_PA_MSB_8580,
+     osc_MSB_out			=> voice_2_PA_MSB_8580,
+     sawtooth           => voice_2_sawtooth_8580,
+     triangle           => voice_2_triangle_8580,
+     st_out             => voice_2_st_out_8580,
+     p_t_out            => voice_2_p_t_out_8580,
+     ps_out             => voice_2_ps_out_8580,
+     pst_out            => voice_2_pst_out_8580,
+--		Osc					=> open,
+--		Env					=> open,
+     signal_out			=> voice_2_8580
+     );
+ 
+ --sid_voice_8580_3: entity work.sid_voice_8580
+ sid_voice_8580_3 : component sid_voice_8580
+   port map(
+     cpuclock => cpuclock,
+     clock              => clk_1Mhz,
+     ce_1m				   => clk_1MHz_en,
+     reset					=> reset_drive,
+     Freq_lo				=> Voice_3_Freq_lo,
+     Freq_hi				=> Voice_3_Freq_hi,
+     Pw_lo					=> Voice_3_Pw_lo,
+     Pw_hi					=> Voice_3_Pw_hi,
+     Control				=> Voice_3_Control,
+     Att_dec				=> Voice_3_Att_dec,
+     Sus_Rel				=> Voice_3_Sus_Rel,
+     osc_MSB_in			=> voice_2_PA_MSB_8580,
+     osc_MSB_out			=> voice_3_PA_MSB_8580,
+     sawtooth           => voice_3_sawtooth_8580,
+     triangle           => voice_3_triangle_8580,
+     st_out             => voice_3_st_out_8580,
+     p_t_out            => voice_3_p_t_out_8580,
+     ps_out             => voice_3_ps_out_8580,
+     pst_out            => voice_3_pst_out_8580,
+     Osc_out				=> Misc_Osc3_Random_8580,
+     Env_out				=> Misc_Env3_8580,
+     signal_out			=> voice_3_8580
+     );
   
   
   

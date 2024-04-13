@@ -63,6 +63,30 @@ end entity internal1541;
 
 architecture romanesque_revival of internal1541 is
 
+  component cpu6502 
+	port (
+        clk       : in  std_logic;
+        reset     : in  std_logic;
+        nmi       : in  std_logic;
+        irq       : in  std_logic;
+        ready     : in  std_logic;
+        write     : out std_logic;
+        write_next: out std_logic;
+        sync      : out std_logic;
+        address   : out unsigned(15 downto 0);
+        address_next: out unsigned(15 downto 0);
+        data_i    : in  unsigned(7 downto 0);
+        data_o    : out unsigned(7 downto 0);
+        data_o_next: out std_logic_vector(7 downto 0);
+        cpu_state : out std_logic_vector(7 downto 0);
+        t         : out std_logic_vector(2 downto 0);
+        cpu_int   : out std_logic
+    );
+	end component;
+
+
+
+
   signal phi_2_1mhz_counter : integer := 0;
 
   -- signals here
@@ -267,19 +291,20 @@ begin
     dob => rom_rdata
     );
 
---  cpu: entity work.cpu6502 port map (
---    clk => clock,
---    reset => drive_reset_n,
---    nmi => nmi,
---    irq => irq,
---    ready => drive_clock_cycle_strobe,
---    write_next => cpu_write_n,
-----    sync => cpu_sync,
---    address => address,
---    address_next => address_next_internal,
---    data_i => rdata,
---    data_o => wdata
---    );
+--  cpu: entity cpu6502 port map (
+  cpu : component cpu6502 port map (
+    clk => clock,
+    reset => drive_reset_n,
+    nmi => nmi,
+    irq => irq,
+    ready => drive_clock_cycle_strobe,
+    write_next => cpu_write_n,
+--    sync => cpu_sync,
+    address => address,
+    address_next => address_next_internal,
+    data_i => rdata,
+    data_o => wdata
+    );
 
   process(clock,address,address_next_internal,cs_ram,ram_rdata,cs_rom,rom_rdata,cpu_write_n)
   begin

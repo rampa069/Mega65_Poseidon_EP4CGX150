@@ -182,19 +182,19 @@ architecture behavioural of slow_devices is
 
 begin
 
---  opl2fm0: entity work.opl2
---    port map (
---      clk            => cpuclock,
---      reset          => reset_inverted,
---      opl2_we        => opl_we,
---      opl2_data      => opl_data,
---      opl2_adr       => opl_adr,
---      kon            => opl_kon,
---      channel_a      => fm_left,
---      channel_b      => fm_right,
---		sample_clk     => opl_sc,
---      sample_clk_128 => opl_sc_128
---      );
+ --opl2fm0: entity work.opl2
+  opl2fm0 : component opl2 port map (
+     clk            => cpuclock,
+     reset          => reset_inverted,
+     opl2_we        => opl_we,
+     opl2_data      => opl_data,
+     opl2_adr       => opl_adr,
+     kon            => opl_kon,
+     channel_a      => fm_left,
+     channel_b      => fm_right,
+		sample_clk     => opl_sc,
+     sample_clk_128 => opl_sc_128
+     );
 
   cartport0: entity work.expansion_port_controller
     generic map ( pixelclock_frequency => 80,
