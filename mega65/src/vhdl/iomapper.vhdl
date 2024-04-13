@@ -1199,81 +1199,81 @@ begin
     end generate;
 
 
---  eth0: if target /= megaphoner4 and target /= qmtecha100t and target /= qmtecha200t and target /= qmtechk325t generate
---    ethernet0 : entity work.ethernet
---      generic map (
---        num_buffers => num_eth_rx_buffers
---        )
---      port map (
---        clock50mhz => clock50mhz,
---        clock200 => clock200mhz,
---        clock => cpuclock,
---        reset => reset,
---        irq => ethernet_irq,
---        ethernet_cs => ethernet_cs,
---
---        cpu_ethernet_stream => cpu_ethernet_stream,
---
---        -- 2nd dipswitch enables remote keyboard input and remote control
---        -- of MEGA65 via ethernet
---        eth_remote_control => dipsw(1),
---        eth_load_enable => eth_load_enable_int,
---
---        ---------------------------------------------------------------------------
---        -- IO lines to the ethernet controller
---        ---------------------------------------------------------------------------
---        eth_mdio => eth_mdio,
---        eth_mdc => eth_mdc,
---        eth_reset => eth_reset,
---        eth_rxd_in => eth_rxd,
---        eth_txd_out => eth_txd,
---        eth_txen_out => eth_txen,
---        eth_rxdv_in => eth_rxdv,
---        eth_rxer => eth_rxer,
---        eth_interrupt => eth_interrupt,
---
---        buffer_moby_toggle => buffer_moby_toggle,
---        buffer_offset => buffer_offset,
---        buffer_address => buffer_address,
---        buffer_rdata => buffer_rdata,
---        debug_vector => debug_vector,
---        raster_number => raster_number,
---        vicii_raster => vicii_raster,
---        badline_toggle => badline_toggle,
---        d031_write_toggle => d031_write_toggle,
---        instruction_strobe => monitor_instruction_strobe,
---        cpu_arrest => ethernet_cpu_arrest,
---
---        eth_keycode_toggle => eth_scancode_toggle,
---        eth_keycode => eth_scancode,
---
---        fastio_addr => unsigned(address),
---        fastio_write => w,
---        fastio_read => r,
---        std_logic_vector(fastio_rdata) => data_o,
---        fastio_wdata => unsigned(data_i)
---        );
---  end generate;
+  eth0: if target /= megaphoner4 and target /= qmtecha100t and target /= qmtecha200t and target /= qmtechk325t generate
+    ethernet0 : entity work.ethernet
+      generic map (
+        num_buffers => num_eth_rx_buffers
+        )
+      port map (
+        clock50mhz => clock50mhz,
+        clock200 => clock200mhz,
+        clock => cpuclock,
+        reset => reset,
+        irq => ethernet_irq,
+        ethernet_cs => ethernet_cs,
 
---  buffered_uart0 : entity work.buffereduart port map (
---    clock => cpuclock,
---    reset => reset,
---    irq => uart_irq,
---    buffereduart_cs => buffereduart_cs,
---
---    ---------------------------------------------------------------------------
---    -- IO lines to the buffered UART
---    ---------------------------------------------------------------------------
---    uart_rx => buffereduart_rx,
---    uart_tx => buffereduart_tx,
---    uart_ringindicate => buffereduart_ringindicate,
---
---    fastio_addr => unsigned(address),
---    fastio_write => w,
---    fastio_read => r,
---    std_logic_vector(fastio_rdata) => data_o,
---    fastio_wdata => unsigned(data_i)
---    );
+        cpu_ethernet_stream => cpu_ethernet_stream,
+
+        -- 2nd dipswitch enables remote keyboard input and remote control
+        -- of MEGA65 via ethernet
+        eth_remote_control => dipsw(1),
+        eth_load_enable => eth_load_enable_int,
+
+        ---------------------------------------------------------------------------
+        -- IO lines to the ethernet controller
+        ---------------------------------------------------------------------------
+        eth_mdio => eth_mdio,
+        eth_mdc => eth_mdc,
+        eth_reset => eth_reset,
+        eth_rxd_in => eth_rxd,
+        eth_txd_out => eth_txd,
+        eth_txen_out => eth_txen,
+        eth_rxdv_in => eth_rxdv,
+        eth_rxer => eth_rxer,
+        eth_interrupt => eth_interrupt,
+
+        buffer_moby_toggle => buffer_moby_toggle,
+        buffer_offset => buffer_offset,
+        buffer_address => buffer_address,
+        buffer_rdata => buffer_rdata,
+        debug_vector => debug_vector,
+        raster_number => raster_number,
+        vicii_raster => vicii_raster,
+        badline_toggle => badline_toggle,
+        d031_write_toggle => d031_write_toggle,
+        instruction_strobe => monitor_instruction_strobe,
+        cpu_arrest => ethernet_cpu_arrest,
+
+        eth_keycode_toggle => eth_scancode_toggle,
+        eth_keycode => eth_scancode,
+
+        fastio_addr => unsigned(address),
+        fastio_write => w,
+        fastio_read => r,
+        std_logic_vector(fastio_rdata) => data_o,
+        fastio_wdata => unsigned(data_i)
+        );
+  end generate;
+
+  buffered_uart0 : entity work.buffereduart port map (
+    clock => cpuclock,
+    reset => reset,
+    irq => uart_irq,
+    buffereduart_cs => buffereduart_cs,
+
+    ---------------------------------------------------------------------------
+    -- IO lines to the buffered UART
+    ---------------------------------------------------------------------------
+    uart_rx => buffereduart_rx,
+    uart_tx => buffereduart_tx,
+    uart_ringindicate => buffereduart_ringindicate,
+
+    fastio_addr => unsigned(address),
+    fastio_write => w,
+    fastio_read => r,
+    std_logic_vector(fastio_rdata) => data_o,
+    fastio_wdata => unsigned(data_i)
+    );
 
   audio0: entity work.audio_complex
     generic map ( clock_frequency => cpu_frequency )

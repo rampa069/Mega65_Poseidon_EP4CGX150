@@ -67,6 +67,15 @@ set clk_7     "pll|altpll_component|auto_generated|pll1|clk[4]"
 
 create_generated_clock -name clk_3m5 -source $clk_7 -divide_by 2 [get_registers clk_3m5_cont]
 
+set_clock_groups -asynchronous \
+	-group [get_clocks sdram_clk] \
+	-group [get_clocks mem_clk  ] \
+	-group [get_clocks vid_clk  ] \
+	-group [get_clocks aud_clk  ] \
+	-group [get_clocks clk_28   ] \
+	-group [get_clocks clk_14   ] \
+	-group [get_clocks clk_7    ] \
+	-group [get_clocks clk_3m5  ]
 
 #**************************************************************
 # Set Clock Latency

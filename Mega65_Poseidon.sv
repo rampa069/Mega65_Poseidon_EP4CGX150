@@ -144,17 +144,10 @@ assign SDRAM2_nWE = 1;
 `include "build_id.v"
 
 localparam CONF_STR = {
-	"ZXN;;",
-	"F,TZX,Load;",
-	"T1,Start/Stop TZX;",
-	`SEP
+	"Mega 65;;",
 	"O34,Scanlines,Off,25%,50%,75%;",
 	"O5,Blend,Off,On;",
 	"O6,Joystick Swap,Off,On;",
-`ifndef USE_AUDIO_IN
-	"O7,Userport,Tape,UART;",
-`endif
-	"O8,Invert tape input,Off,On;",
 	`SEP
 	"T0,Reset;",
 	"V,v1.00.",`BUILD_DATE

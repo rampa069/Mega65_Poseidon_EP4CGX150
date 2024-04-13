@@ -35,7 +35,7 @@ begin  -- behavioural
     --report "COLOURRAM: A Reading from $" & to_hstring(unsigned(addra))
     --  & " = $" & to_hstring(ram(to_integer(unsigned(addra))));
     if(rising_edge(Clka)) then 
---      if ena='1' then
+      if ena='1' then
         if(wea="1") then
           ram(to_integer(unsigned(addra(14 downto 0)))) := dina;
           report "COLOURRAM: A writing to $" & to_hstring(unsigned(addra))
@@ -44,7 +44,7 @@ begin  -- behavioural
           else
             douta <= ram(to_integer(unsigned(addra(14 downto 0))));            
         end if;
---      end if;
+      end if;
     end if;
   end process;
 

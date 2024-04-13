@@ -482,9 +482,12 @@ set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 
 
 
+set_global_assignment -name QIP_FILE mega65/src/verilog/asym_ram_64x16b.qip
+set_global_assignment -name QIP_FILE mega65/src/verilog/asym_ram_64x1K.qip
+set_global_assignment -name QIP_FILE mega65/src/verilog/asym_ram_128x1K.qip
+set_global_assignment -name VERILOG_FILE mega65/src/verilog/asym_ram_sdp.v
 set_global_assignment -name VHDL_FILE mega65/src/vhdl/UART_TX_CTRL.vhdl
 set_global_assignment -name VERILOG_FILE mega65/src/verilog/monitor_bus.v
-set_global_assignment -name VERILOG_FILE mega65/src/verilog/asym_ram_sdp.v
 set_global_assignment -name VERILOG_FILE mega65/src/verilog/monitor_top.v
 set_global_assignment -name VHDL_FILE mega65/src/vhdl/ghdl_ram8x4096_sync_2cs.vhdl
 set_global_assignment -name VHDL_FILE mega65/src/vhdl/bitplane.vhdl
