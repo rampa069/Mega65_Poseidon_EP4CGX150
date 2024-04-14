@@ -618,9 +618,9 @@ architecture Behavioral of viciv is
   -- XXX move reading of sprite registers to vicii_sprites module
   signal sprite_multi0_colour : unsigned(7 downto 0) := x"04";
   signal sprite_multi1_colour : unsigned(7 downto 0) := x"05";
-  signal sprite_x : sprite_vector_eight := (others => x"02");
-  signal sprite_y : sprite_vector_eight := (others => x"02");
-  signal sprite_colours : sprite_vector_eight := (others => x"00");
+  signal sprite_x : sprite_vector_eight; -- := (others => x"02");
+  signal sprite_y : sprite_vector_eight; -- := (others => x"02");
+  signal sprite_colours : sprite_vector_eight; -- := (others => x"00");
 
   -- VIC-III bitplane registers
   signal bitplane_mode : std_logic := '0';
