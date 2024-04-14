@@ -355,7 +355,7 @@ wire sd_miso;
 sd_card sd_card (
 	// connection to io controller
 	.clk_sys      ( clock100       ),
-	.sd_lba       ( sd_lba         ),
+	.sd_lba       ( sd_lba0         ),
 	.sd_rd        ( sd_rd[0]       ),
 	.sd_wr        ( sd_wr[0]       ),
 	.sd_ack       ( sd_ack         ),
@@ -364,7 +364,7 @@ sd_card sd_card (
 	.sd_sdhc      ( sd_sdhc        ),
 	.sd_buff_dout ( sd_dout        ),
 	.sd_buff_wr   ( sd_dout_strobe ),
-	.sd_buff_din  ( sd_din         ),
+	.sd_buff_din  ( sd_din0         ),
 	.sd_buff_addr ( sd_buff_addr   ),
 	.img_mounted  ( img_mounted[0] ),
 	.img_size     ( img_size       ),
@@ -386,7 +386,7 @@ wire sd2_miso;
 sd_card sd_card2 (
 	// connection to io controller
 	.clk_sys      ( clock100       ),
-	.sd_lba       ( sd_lba         ),
+	.sd_lba       ( sd_lba1        ),
 	.sd_rd        ( sd_rd[1]       ),
 	.sd_wr        ( sd_wr[1]       ),
 	.sd_ack       ( sd_ack         ),
@@ -395,7 +395,7 @@ sd_card sd_card2 (
 	.sd_sdhc      ( sd_sdhc        ),
 	.sd_buff_dout ( sd_dout        ),
 	.sd_buff_wr   ( sd_dout_strobe ),
-	.sd_buff_din  ( sd_din         ),
+	.sd_buff_din  ( sd_din1         ),
 	.sd_buff_addr ( sd_buff_addr   ),
 	.img_mounted  ( img_mounted[1] ),
 	.img_size     ( img_size       ),
