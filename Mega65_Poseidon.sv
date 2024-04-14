@@ -261,7 +261,7 @@ wire        i2c_ack;
 wire        i2c_end;
 `endif
 
-user_io #(.STRLEN(($size(CONF_STR)>>3)), .ROM_DIRECT_UPLOAD(DIRECT_UPLOAD), .FEATURES(32'h0 | (BIG_OSD << 13) | (HDMI << 14)))user_io(
+user_io #(.STRLEN(($size(CONF_STR)>>3)), .SD_IMAGES(2),.ROM_DIRECT_UPLOAD(DIRECT_UPLOAD), .FEATURES(32'h0 | (BIG_OSD << 13) | (HDMI << 14)))user_io(
 	.clk_sys        ( clock27        ),
 	.clk_sd         ( clock100       ),
 	.conf_str       ( CONF_STR       ),
@@ -375,36 +375,36 @@ sd_card sd_card (
 	.sd_sdo       ( sd_miso )
 );
 
-wire sd2_cs_n;
+wire sd2_cs_n = 1;
 wire sd2_sck;
 wire sd2_mosi;
 wire sd2_miso;
 
-sd_card sd_card2 (
-	// connection to io controller
-	.clk_sys      ( clock100       ),
-	.sd_lba       ( sd_lba         ),
-	.sd_rd        ( sd_rd[1]       ),
-	.sd_wr        ( sd_wr[1]       ),
-	.sd_ack       ( sd_ack         ),
-	.sd_ack_conf  ( sd_ack_conf    ),
-	.sd_conf      ( sd_conf        ),
-	.sd_sdhc      ( sd_sdhc        ),
-	.sd_buff_dout ( sd_dout        ),
-	.sd_buff_wr   ( sd_dout_strobe ),
-	.sd_buff_din  ( sd_din         ),
-	.sd_buff_addr ( sd_buff_addr   ),
-	.img_mounted  ( img_mounted[1] ),
-	.img_size     ( img_size       ),
-	.allow_sdhc   ( 1'b1           ),
-	.sd_busy      ( sd_busy        ),
-
-	// connection to local CPU
-	.sd_cs        ( sd2_cs_n ),
-	.sd_sck       ( sd2_sck  ),
-	.sd_sdi       ( sd2_mosi ),
-	.sd_sdo       ( sd2_miso )
-);
+//sd_card sd_card2 (
+//	// connection to io controller
+//	.clk_sys      ( clock100       ),
+//	.sd_lba       ( sd_lba         ),
+//	.sd_rd        ( sd_rd[1]       ),
+//	.sd_wr        ( sd_wr[1]       ),
+//	.sd_ack       ( sd_ack         ),
+//	.sd_ack_conf  ( sd_ack_conf    ),
+//	.sd_conf      ( sd_conf        ),
+//	.sd_sdhc      ( sd_sdhc        ),
+//	.sd_buff_dout ( sd_dout        ),
+//	.sd_buff_wr   ( sd_dout_strobe ),
+//	.sd_buff_din  ( sd_din         ),
+//	.sd_buff_addr ( sd_buff_addr   ),
+//	.img_mounted  ( img_mounted[1] ),
+//	.img_size     ( img_size       ),
+//	.allow_sdhc   ( 1'b1           ),
+//	.sd_busy      ( sd_busy        ),
+//
+//	// connection to local CPU
+//	.sd_cs        ( sd2_cs_n ),
+//	.sd_sck       ( sd2_sck  ),
+//	.sd_sdi       ( sd2_mosi ),
+//	.sd_sdo       ( sd2_miso )
+//);
 
 // data io (TZX upload)
 wire        ioctl_downl;
