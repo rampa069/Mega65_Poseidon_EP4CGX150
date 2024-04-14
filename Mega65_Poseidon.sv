@@ -380,7 +380,7 @@ sd_card sd_card (
 	.sd_sdo       ( sd_miso )
 );
 
-wire sd2_cs_n = 1;
+wire sd2_cs_n;
 wire sd2_sck;
 wire sd2_mosi;
 wire sd2_miso;
