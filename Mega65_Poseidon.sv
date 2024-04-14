@@ -145,7 +145,9 @@ assign SDRAM2_nWE = 1;
 
 localparam CONF_STR = {
 	"Mega 65;;",
-	"S0U,VHDIMG,Mount SD;",
+	"S0U,VHDIMG,Mount internal SD;",
+	"S1U,VHDIMG,Mount external SD;",
+	`SEP
 	"O34,Scanlines,Off,25%,50%,75%;",
 	"O5,Blend,Off,On;",
 	"O6,Joystick Swap,Off,On;",
@@ -189,47 +191,7 @@ pll2	pll2 (
 	);
 
 	
-//reg         clk_28_psg_en;
-//reg   [3:0] clk_28_div;
 
-//always @(posedge clk_28) begin
-//	clk_28_div <= clk_28_div + 1'd1;
-//	clk_28_psg_en <= clk_28_div == 0;
-//end
-//
-//// CPU clock gen
-//wire        zxn_clock_contend;
-//wire        zxn_clock_lsb;
-//wire  [1:0] zxn_cpu_speed;
-//reg         clk_3m5_cont;
-//wire        clk_cpu;
-//
-//always @(posedge clk_7, posedge reset) begin
-//	if (reset)
-//		clk_3m5_cont <= 0;
-//	else if (zxn_clock_lsb & !zxn_clock_contend)
-//		clk_3m5_cont <= 0;
-//	else if (!zxn_clock_lsb)
-//		clk_3m5_cont <= 1;
-//end
-//
-//reg  [3:0] clk_select;
-//always @(posedge clk_28, posedge reset) begin
-//	if (reset) begin
-//		clk_select <= 4'b0001;
-//	end
-//	else if (zxn_ram_a_rfsh) begin
-//		case (zxn_cpu_speed)
-//		2'b00: clk_select <= 4'b0001;
-//		2'b01: clk_select <= 4'b0010;
-//		2'b10: clk_select <= 4'b0100;
-//		2'b11: clk_select <= 4'b1000;
-//		endcase
-//	end
-//end
-//
-//clock_mux clocks({clk_28, clk_14, clk_7, clk_3m5_cont},clk_select,clk_cpu);
-//
 //// Reset
 reg        reset = 1;
 wire       zxn_reset_soft;
@@ -413,6 +375,37 @@ sd_card sd_card (
 	.sd_sdo       ( sd_miso )
 );
 
+wire sd2_cs_n;
+wire sd2_sck;
+wire sd2_mosi;
+wire sd2_miso;
+
+sd_card sd_card2 (
+	// connection to io controller
+	.clk_sys      ( clock100       ),
+	.sd_lba       ( sd_lba         ),
+	.sd_rd        ( sd_rd[1]       ),
+	.sd_wr        ( sd_wr[1]       ),
+	.sd_ack       ( sd_ack         ),
+	.sd_ack_conf  ( sd_ack_conf    ),
+	.sd_conf      ( sd_conf        ),
+	.sd_sdhc      ( sd_sdhc        ),
+	.sd_buff_dout ( sd_dout        ),
+	.sd_buff_wr   ( sd_dout_strobe ),
+	.sd_buff_din  ( sd_din         ),
+	.sd_buff_addr ( sd_buff_addr   ),
+	.img_mounted  ( img_mounted[1] ),
+	.img_size     ( img_size       ),
+	.allow_sdhc   ( 1'b1           ),
+	.sd_busy      ( sd_busy        ),
+
+	// connection to local CPU
+	.sd_cs        ( sd2_cs_n ),
+	.sd_sck       ( sd2_sck  ),
+	.sd_sdi       ( sd2_mosi ),
+	.sd_sdo       ( sd2_miso )
+);
+
 // data io (TZX upload)
 wire        ioctl_downl;
 wire        ioctl_upl;
@@ -536,11 +529,15 @@ container Mega65_instance (
    .audio_lrclk			(I2S_LRCK),
    .audio_sdata			(I2S_DATA),
 	
+	.sdReset				   (sd_cs_n),
+   .sdClock				   (sd_sck ),
+   .sdMOSI					(sd_mosi),
+   .sdMISO					(sd_miso),
 	
-	.sd2Reset				(sd_cs_n),
-   .sd2Clock				(sd_sck ),
-   .sd2MOSI					(sd_mosi),
-   .sd2MISO					(sd_miso),
+	.sd2Reset				(sd2_cs_n),
+   .sd2Clock				(sd2_sck ),
+   .sd2MOSI					(sd2_mosi),
+   .sd2MISO					(sd2_miso),
 	
 	.led						(  ),
    .led2						(led2)
@@ -577,7 +574,7 @@ mist_video #(.COLOR_DEPTH(8), .SD_HCNT_WIDTH(10), .OUT_COLOR_DEPTH(VGA_BITS), .B
 	.blend          ( blend            ),
 	.scandoubler_disable( scandoublerD ),
 	.scanlines      ( scanlines        ),
-	.ypbpr          ( ypbpr            ),
+	.ypbpr          ( 0            ),
 	.no_csync       ( no_csync         )
 	);
 
