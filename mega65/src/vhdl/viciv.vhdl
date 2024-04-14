@@ -2083,7 +2083,7 @@ begin
       end if;
     end if;
 
-    if rising_edge(cpuclock) then
+    if (cpuclock = '1') then
 
       if hw_errata_level /= prev_hw_errata_level then
         prev_hw_errata_level <= hw_errata_level;
@@ -2976,15 +2976,15 @@ begin
           null;
         elsif register_number>=256 and register_number<512 then
           -- @IO:C65 $D100-$D1FF VIC-III:PALRED red palette values (reversed nybl order)
-          --palette_fastio_address <= palette_bank_fastio & std_logic_vector(register_number(7 downto 0));
+          palette_fastio_address <= palette_bank_fastio & std_logic_vector(register_number(7 downto 0));
           palette_we(3) <= '1';
         elsif register_number>=512 and register_number<768 then
           -- @IO:C65 $D200-$D2FF VIC-III:PALGREEN green palette values (reversed nybl order)
-          --palette_fastio_address <= palette_bank_fastio & std_logic_vector(register_number(7 downto 0));
+          palette_fastio_address <= palette_bank_fastio & std_logic_vector(register_number(7 downto 0));
           palette_we(2) <= '1';
         elsif register_number>=768 and register_number<1024 then
           -- @IO:C65 $D300-$D3FF VIC-III:PALBLUE blue palette values (reversed nybl order)
-          --palette_fastio_address <= palette_bank_fastio & std_logic_vector(register_number(7 downto 0));
+          palette_fastio_address <= palette_bank_fastio & std_logic_vector(register_number(7 downto 0));
           palette_we(1) <= '1';
         else
           null;
