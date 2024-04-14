@@ -145,6 +145,7 @@ assign SDRAM2_nWE = 1;
 
 localparam CONF_STR = {
 	"Mega 65;;",
+	"S0U,VHDIMG,Mount SD;",
 	"O34,Scanlines,Off,25%,50%,75%;",
 	"O5,Blend,Off,On;",
 	"O6,Joystick Swap,Off,On;",
@@ -299,8 +300,8 @@ wire        i2c_end;
 `endif
 
 user_io #(.STRLEN(($size(CONF_STR)>>3)), .ROM_DIRECT_UPLOAD(DIRECT_UPLOAD), .FEATURES(32'h0 | (BIG_OSD << 13) | (HDMI << 14)))user_io(
-	.clk_sys        ( clock27         ),
-	.clk_sd         ( clock27         ),
+	.clk_sys        ( clock27        ),
+	.clk_sd         ( clock100       ),
 	.conf_str       ( CONF_STR       ),
 	.SPI_CLK        ( SPI_SCK        ),
 	.SPI_SS_IO      ( CONF_DATA0     ),
@@ -388,7 +389,7 @@ wire sd_miso;
 	
 sd_card sd_card (
 	// connection to io controller
-	.clk_sys      ( clock27         ),
+	.clk_sys      ( clock100       ),
 	.sd_lba       ( sd_lba         ),
 	.sd_rd        ( sd_rd[0]       ),
 	.sd_wr        ( sd_wr[0]       ),
@@ -436,152 +437,7 @@ data_io #(.ROM_DIRECT_UPLOAD(1)) data_io(
 	.ioctl_dout    ( ioctl_dout   ),
 	.ioctl_din     ( ioctl_din    )
 );
-//
-//wire        tzx_download = ioctl_downl & ioctl_index == 1;
-//reg         tzx_ram_req_t;
-//wire [24:0] tzx_ram_addr = tzx_download ? {1'b1, ioctl_addr[23:0]} : {1'b1, tzxplayer_addr[23:0]};
-//wire [15:0] tzx_ram_di;
-//wire        tzx_ram_we = tzx_download;
-//wire  [7:0] tzx_ram_do = ioctl_dout;
-//wire        tzx_ram_ack, tzx_ram_ackD;
-//reg         tzx_ram_dirty;
-//reg         ioctl_tzx_req_t;
-//
-//// TZX Player
-//reg  [23:0] tzxplayer_addr;
-//reg  [23:0] tzxplayer_last_addr;
-//reg  [23:0] tzxplayer_loop_addr;
-//wire        tzxplayer_req, tzxplayer_reqD;
-//wire        tzxplayer_ack;
-//wire        tzxplayer_audio;
-//reg   [7:0] tzxplayer_din;
-//reg         tzxplayer_pause = 1;
-//wire        tzxplayer_running;
-//reg         status_pauseD;
-//wire        tzxplayer_loop_start, tzxplayer_loop_startD;
-//wire        tzxplayer_loop_next, tzxplayer_loop_nextD;
-//wire        tzxplayer_stop, tzxplayer_stopD;
-//wire        tzxplayer_stop48k;
-//
-//always @(posedge clk_28) begin
-//	tzx_ram_ackD <= tzx_ram_ack;
-//	tzxplayer_loop_startD <= tzxplayer_loop_start;
-//	tzxplayer_loop_nextD <= tzxplayer_loop_next;
-//	tzxplayer_stopD <= tzxplayer_stop;
-//	tzxplayer_reqD <= tzxplayer_req;
-//	tzx_ram_ackD <= tzx_ram_ack;
-//
-//	if (reset) begin
-//		tzxplayer_addr <= 0;
-//		tzxplayer_last_addr <= 0;
-//		tzxplayer_loop_addr <= 0;
-//		tzxplayer_pause <= 1;
-//		tzx_ram_dirty <= 0;
-//	end else if (tzx_download) begin
-//		if (ioctl_wr) tzx_ram_req_t <= ~tzx_ram_req_t;
-//		tzxplayer_addr <= 0;
-//		tzxplayer_last_addr <= ioctl_addr[23:0];
-//		tzxplayer_loop_addr <= 0;
-//		tzxplayer_pause <= 1;
-//		tzx_ram_dirty <= 0;
-//	end else begin
-//		if (tzxplayer_reqD ^ tzxplayer_req) begin
-//			// TZXPlayer requests a new byte
-//			if (tzxplayer_addr == tzxplayer_last_addr + 1'd1) // end?
-//				tzxplayer_pause <= 1;
-//			else if (tzx_ram_dirty | ~tzxplayer_addr[0]) // ask the sdram for even bytes only
-//				tzx_ram_req_t <= ~tzx_ram_req_t;
-//		end
-//		if ((tzx_ram_ackD ^ tzx_ram_ack) | (~tzx_ram_dirty & tzxplayer_addr[0] & (tzxplayer_reqD ^ tzxplayer_req))) begin
-//			tzxplayer_din <= tzxplayer_addr[0] ? tzx_ram_di[7:0] : tzx_ram_di[15:8];
-//			tzxplayer_ack <= tzxplayer_req;
-//			tzxplayer_addr <= tzxplayer_addr + 1'd1;
-//			tzx_ram_dirty <= 0;
-//		end
-//
-//		if (!tzxplayer_stopD & tzxplayer_stop) tzxplayer_pause <= 1;
-//		if (!tzxplayer_loop_startD & tzxplayer_loop_start) tzxplayer_loop_addr <= tzxplayer_addr;
-//		if (!tzxplayer_loop_nextD & tzxplayer_loop_next) begin
-//			tzxplayer_addr <= tzxplayer_loop_addr;
-//			tzx_ram_dirty <= 1;
-//		end
-//
-//		status_pauseD <= pausetzx;
-//		if (!status_pauseD & pausetzx) tzxplayer_pause <= ~tzxplayer_pause;
-//	end
-//end
-//
-//reg [24:0] tape_motor_cnt;
-//wire       tape_motor_led = tape_motor_cnt[24] ? tape_motor_cnt[23:16] > tape_motor_cnt[7:0] : tape_motor_cnt[23:16] <= tape_motor_cnt[7:0];
-//always @(posedge clock27) tape_motor_cnt <= tape_motor_cnt + 1'd1;
-//
-//reg        tzx_ce;
-//always @(*) begin
-//	case (clk_select)
-//	4'b0001: tzx_ce <= clk_28_div[2:0] == 0;
-//	4'b0010: tzx_ce <= clk_28_div[1:0] == 0;
-//	4'b0100: tzx_ce <= !clk_28_div[0];
-//	default: tzx_ce <= 1;
-//	endcase
-//end
-//
-//tzxplayer #(.TZX_MS(3500)) tzxplayer
-//(
-//	.clk(clk_28),
-//	.ce(tzx_ce),
-//	.tzx_req(tzxplayer_req),
-//	.tzx_ack(tzxplayer_ack),
-//	.loop_start(tzxplayer_loop_start),
-//	.loop_next(tzxplayer_loop_next),
-//	.stop(tzxplayer_stop),
-//	.stop48k(tzxplayer_stop48k),
-//	.restart_tape(tzx_download),
-//	.host_tap_in(tzxplayer_din),
-//	.cass_read(tzxplayer_audio),
-//	.cass_motor(!tzxplayer_pause),
-//	.cass_running(tzxplayer_running)
-//);
 
-// SDRAM
-// Port A (CPU)
-//wire [20:0] zxn_ram_a_addr;
-//wire        zxn_ram_a_req;
-//wire        zxn_ram_a_rd_n;
-//wire [15:0] zxn_ram_a_di;
-//wire  [7:0] zxn_ram_a_do;
-//wire        zxn_ram_a_rfsh;
-//// Port B is read only (LAYER 2)
-//wire [20:0] zxn_ram_b_addr;
-//wire        zxn_ram_b_req_t;
-//wire [15:0] zxn_ram_b_di;
-//
-//wire        sdram_cpuwait;
-//wire        sdram_cpuwait2;
-//
-//sdram sdram(
-//	.*,
-//	.init_n        ( pll_locked      ),
-//	.clk           ( clk_112         ),
-//	.refresh_en    ( /*zxn_cpu_rfsh_n*/zxn_ram_a_rfsh & ~zxn_rgb_hb_n ),
-//	.reqA          ( zxn_ram_a_req_reg ),
-//	.addrA         ( zxn_ram_a_addr  ),
-//	.weA           ( zxn_ram_a_rd_n  ),
-//	.dinA          ( zxn_ram_a_do    ),
-//	.doutA         ( zxn_ram_a_di    ),      // data output to cpu
-//	.cpuwait       ( sdram_cpuwait   ),
-//	.cpuwait2      ( sdram_cpuwait2  ),
-//
-//	.reqB          ( zxn_ram_b_req_t ),
-//	.addrB         ( zxn_ram_b_addr  ),
-//	.doutB         ( zxn_ram_b_di    ),
-//
-//	.reqC          ( tzx_ram_req_t   ),
-//	.addrC         ( tzx_ram_addr    ),
-//	.doutC         ( tzx_ram_di      ),
-//	.weC           ( tzx_ram_we      ),
-//	.dinC          ( tzx_ram_do      ),
-//	.ackC          ( tzx_ram_ack     )
-//);
 
 // Wait generator
 reg         sdram_cpuwaitD;
@@ -648,7 +504,7 @@ container Mega65_instance (
 	.clock100				(clock100),
 	.ethclock				(clock50),
 	
-	.btnCpuReset			(reset),
+	.btnCpuReset			(~reset),
 	
 	.ps2clk 					(ps2clk),
 	.ps2data					(ps2data),
@@ -693,266 +549,22 @@ container Mega65_instance (
 
 
 
-//zxnext #(
-//	.g_machine_id(`MACHINE_ID),
-//	.g_version(8'h32),
-//	.g_sub_version(8'h0A),
-//	.g_board_issue(4'h2),
-//	.g_video_def(3'h0)
-//) zxnext_instance (
-//
-//	// CLOCK
-//
-//	.i_CLK_28            (clk_28),
-//	.i_CLK_28_n          (clk_28n),
-//	.i_CLK_14            (clk_14),
-//	.i_CLK_7             (clk_7),
-//	.i_CLK_CPU           (clk_cpu),
-//	.i_CLK_PSG_EN        (clk_28_psg_en),
-//
-//	.o_CPU_SPEED         (zxn_cpu_speed),
-//	.o_CPU_CONTEND       (zxn_clock_contend),
-//	.o_CPU_CLK_LSB       (zxn_clock_lsb),
-//
-//	// RESET
-//
-//	.i_RESET             (reset),
-//
-//	.o_RESET_SOFT        (zxn_reset_soft),
-//	.o_RESET_HARD        (zxn_reset_hard),
-//	.o_RESET_PERIPHERAL  (zxn_reset_peripheral),
-//
-//	// FLASH BOOT
-//
-//	.o_FLASH_BOOT        (/*zxn_flashboot*/),
-//	.o_CORE_ID           (/*zxn_coreid*/),
-//
-//	// SPECIAL KEYS
-//
-//	.i_SPKEY_FUNCTION    (zxn_function_keys),
-//	.i_SPKEY_BUTTONS     (zxn_buttons),
-//
-//	// MEMBRANE KEYBOARD
-//
-//	.o_KBD_CANCEL        (zxn_cancel_extended_entries),
-//
-//	.o_KBD_ROW           (zxn_key_row),
-//	.i_KBD_COL           (zxn_key_col),
-//
-//	.i_KBD_EXTENDED_KEYS (zxn_extended_keys),
-//
-//	// PS/2 KEYBOARD AND KEY JOYSTICK SETUP
-//
-//	.o_KEYMAP_ADDR       (zxn_keymap_addr),
-//	.o_KEYMAP_DATA       (zxn_keymap_dat),
-//	.o_KEYMAP_WE         (zxn_keymap_we),
-//	.o_JOYMAP_WE         (zxn_joymap_we),
-//
-//	// JOYSTICK
-//
-//	.i_JOY_LEFT          (zxn_joy_left),
-//	.i_JOY_RIGHT         (zxn_joy_right),
-//
-//	.o_JOY_IO_MODE_EN    (zxn_joy_io_mode_en),
-//	.o_JOY_IO_MODE_PIN_7 (/*zxn_joy_io_mode_pin_7*/),
-//
-//	.o_JOY_LEFT_TYPE     (zxn_joy_left_type),
-//	.o_JOY_RIGHT_TYPE    (zxn_joy_right_type),
-//
-//	// MOUSE
-//
-//	.i_MOUSE_X           (zxn_mouse_x),
-//	.i_MOUSE_Y           (zxn_mouse_y),
-//	.i_MOUSE_BUTTON      (zxn_mouse_button),
-//	.i_MOUSE_WHEEL       (zxn_mouse_wheel[3:0]),
-//
-//	.o_PS2_MODE          (/*zxn_ps2_mode*/),
-//	.o_MOUSE_CONTROL     (/*zxn_mouse_control*/),
-//
-//	// I2C
-//
-//	.i_I2C_SCL_n         (zxn_i2c_scl_n_i),
-//	.i_I2C_SDA_n         (zxn_i2c_sda_n_i),
-//
-//	.o_I2C_SCL_n         (zxn_i2c_scl_n_o),
-//	.o_I2C_SDA_n         (zxn_i2c_sda_n_o),
-//
-//	// SPI
-//
-//	.o_SPI_SS_FLASH_n    (/*zxn_spi_ss_flash_n*/),
-//	.o_SPI_SS_SD1_n      (/*zxn_spi_ss_sd1_n*/),
-//	.o_SPI_SS_SD0_n      (zxn_spi_ss_sd0_n),
-//
-//	.o_SPI_SCK           (zxn_spi_sck),
-//	.o_SPI_MOSI          (zxn_spi_mosi),
-//
-//	.i_SPI_SD_MISO       (zxn_spi_miso),
-//	.i_SPI_FLASH_MISO    (/*flash_miso_i*/),
-//
-//	// UART
-//
-//	.i_UART0_RX          (zxn_uart0_rx),
-//	.o_UART0_TX          (zxn_uart0_tx),
-//
-//	// VIDEO
-//	// synchronized to i_CLK_14
-//
-//	.o_RGB               (zxn_rgb),
-//	.o_RGB_CS_n          (zxn_rgb_cs_n),
-//	.o_RGB_VS_n          (zxn_rgb_vs_n),
-//	.o_RGB_HS_n          (zxn_rgb_hs_n),
-//	.o_RGB_VB_n          (zxn_rgb_vb_n),
-//	.o_RGB_HB_n          (zxn_rgb_hb_n),
-//
-//	.o_VIDEO_50_60       (/*zxn_video_50_60*/),
-//	.o_VIDEO_SCANLINES   (/*zxn_video_scanlines*/),
-//	.o_VIDEO_SCANDOUBLE  (/*zxn_video_scandouble_en*/),
-//
-//	.o_VIDEO_MODE        (/*zxn_video_mode*/),                     // VGA 0-6, HDMI
-//	.o_MACHINE_TIMING    (/*zxn_machine_timing*/),                 // video timing: 00X = 48k, 010 = 128k, 011 = +3, 100 = pentagon
-//
-//	.o_HDMI_RESET        (/*zxn_hdmi_reset*/),
-//
-//	// AUDIO
-//
-//	.o_AUDIO_HDMI_AUDIO_EN(/*zxn_hdmi_audio*/),
-//
-//	.o_AUDIO_SPEAKER_EN  (/*zxn_speaker_en*/),
-//	.o_AUDIO_SPEAKER_BEEP(/*zxn_speaker_beep*/),
-//
-//	.i_AUDIO_EAR         (ear_port_i_qq),
-//	.o_AUDIO_MIC         (zxn_tape_mic),
-//
-//	.o_AUDIO_SPEAKER_EAR (/*zxn_audio_ear*/),
-//	.o_AUDIO_SPEAKER_MIC (/*zxn_audio_mic*/),
-//
-//	.o_AUDIO_L           (zxn_audio_L_pre),
-//	.o_AUDIO_R           (zxn_audio_R_pre),
-//
-//	// EXTERNAL SRAM (synchronized to i_CLK_28)
-//	//memory transactions complete in one cycle, data read is registered but available asap
-//
-//	// Port A is read/write (CPU)
-//
-//	.o_RAM_A_ADDR        (zxn_ram_a_addr),
-//	.o_RAM_A_REQ2        (zxn_ram_a_req),
-//	.i_RAM_A_REQ_ALLOW   (!clk_select[zxn_cpu_speed]),
-//	.o_RAM_A_RFSH        (zxn_ram_a_rfsh),
-//	.o_RAM_A_RD_n        (zxn_ram_a_rd_n),
-//	.i_RAM_A_DI          (zxn_ram_a_addr[0] ? zxn_ram_a_di[7:0] : zxn_ram_a_di[15:8]),
-//	.o_RAM_A_DO          (zxn_ram_a_do),
-//	.i_RAM_A_WAIT_n      (zxn_ram_a_wait_n),
-//
-//	// Port B is read only (LAYER 2)
-//
-//	.o_RAM_B_ADDR        (zxn_ram_b_addr),
-//	.o_RAM_B_REQ_T       (zxn_ram_b_req_t),
-//	.i_RAM_B_DI          (zxn_ram_b_addr[0] ? zxn_ram_b_di[7:0] : zxn_ram_b_di[15:8]),
-//
-//	// EXPANSION BUS
-//
-//	.o_BUS_ADDR          (/*zxn_cpu_a*/),
-//	.i_BUS_DI            (/*zxn_bus_di*/),
-//	.o_BUS_DO            (/*zxn_cpu_do*/),
-//	.o_BUS_MREQ_n        (zxn_cpu_mreq_n),
-//	.o_BUS_IORQ_n        (zxn_cpu_iorq_n),
-//	.o_BUS_RD_n          (zxn_cpu_rd_n),
-//	.o_BUS_WR_n          (zxn_cpu_wr_n),
-//	.o_BUS_M1_n          (/*zxn_cpu_m1_n*/),
-//	.i_BUS_WAIT_n        (zxn_bus_wait_n),
-//	.i_BUS_NMI_n         (zxn_bus_nmi_n),
-//	.i_BUS_INT_n         (zxn_bus_int_n),
-//	.o_BUS_INT_n         (/*zxn_cpu_int_n*/),
-//	.i_BUS_BUSREQ_n      (zxn_bus_busreq_n),
-//	.o_BUS_BUSAK_n       (/*zxn_cpu_busak_n*/),
-//	.o_BUS_HALT_n        (/*zxn_cpu_halt_n*/),
-//	.o_BUS_RFSH_n        (zxn_cpu_rfsh_n),
-//	.o_BUS_IEO           (/*zxn_cpu_ieo*/),
-//
-//	.i_BUS_ROMCS_n       (zxn_bus_romcs_n),
-//	.i_BUS_IORQULA_n     (zxn_bus_iorqula_n),
-//
-//	.o_BUS_EN            (/*zxn_bus_en*/),
-//	.o_BUS_CLKEN         (/*zxn_bus_clken*/),
-//
-//	.o_BUS_NMI_DEBOUNCE_DISABLE (/*zxn_bus_nmi_debounce_disable*/),
-//
-//	// ESP GPIO
-//
-//	.i_ESP_GPIO_20       (/*zxn_esp_gpio20_i*/),
-//
-//	.o_ESP_GPIO_0        (/*zxn_esp_gpio0_o*/),
-//	.o_ESP_GPIO_0_EN     (/*zxn_esp_gpio0_en_o*/),
-//
-//	// PI GPIO
-//
-//	.i_GPIO              (/*zxn_pi_gpio_i*/),
-//
-//	.o_GPIO              (/*zxn_gpio_o*/),
-//	.o_GPIO_EN           (/*zxn_gpio_en*/)
-//);
-
-// Keyboard
-//wire [10:1] zxn_function_keys;
-//wire  [1:0] zxn_buttons;
-//wire        zxn_cancel_extended_entries;
-//wire  [7:0] zxn_key_row;
-//wire  [4:0] zxn_key_col = membrane_keys & joy_kbd;
-//wire [15:0] zxn_extended_keys;
-//
-//wire  [4:0] membrane_keys;
-//
-//keyboard keyboard (
-//	.reset        ( reset         ),
-//	.clk_sys      ( clk_28        ),
-//
-//	.key_strobe   ( key_strobe    ),
-//	.key_pressed  ( key_pressed   ),
-//	.key_extended ( key_extended  ),
-//	.key_code     ( key_code      ),
-//
-//	.addr         ( zxn_key_row   ),
-//	.key_data     ( membrane_keys ),
-//
-//	.Fn           ( zxn_function_keys ),
-//	.mod          ( )
-//);
 
 reg   [5:0] joy_kempston;
 reg   [4:0] joy_sinclair1;
 reg   [4:0] joy_sinclair2;
 reg   [4:0] joy_cursor;
 
-//always @(*) begin
-//	joy_sinclair1 = 5'h0;
-//	joy_sinclair2 = 5'h0;
-//	joy_cursor = 5'h0;
-//	case (zxn_joy_left_type)
-//		3'b011: joy_sinclair1 |= zxn_joy_left[4:0];
-//		3'b000: joy_sinclair2 |= zxn_joy_left[4:0];
-//		3'b010: joy_cursor    |= zxn_joy_left[4:0];
-//		default: ;
-//	endcase
-//	case (zxn_joy_right_type)
-//		3'b011: joy_sinclair1 |= zxn_joy_right[4:0];
-//		3'b000: joy_sinclair2 |= zxn_joy_right[4:0];
-//		3'b010: joy_cursor    |= zxn_joy_right[4:0];
-//		default: ;
-//	endcase
-//end
-
-//wire [4:0] joy_kbd = ({5{zxn_key_row[4]}} | ~({joy_sinclair1[1:0], joy_sinclair1[2], joy_sinclair1[3], joy_sinclair1[4]} | {joy_cursor[2], joy_cursor[3], joy_cursor[0], 1'b0, joy_cursor[4]})) &
-//                     ({5{zxn_key_row[3]}} | ~({joy_sinclair2[1:0], joy_sinclair2[2], joy_sinclair2[3], joy_sinclair2[4]} | {joy_cursor[1], 4'b0000}));
 
 // Video out
-mist_video #(.COLOR_DEPTH(6), .SD_HCNT_WIDTH(10), .OUT_COLOR_DEPTH(VGA_BITS), .BIG_OSD(BIG_OSD)) mist_video(
+mist_video #(.COLOR_DEPTH(8), .SD_HCNT_WIDTH(10), .OUT_COLOR_DEPTH(VGA_BITS), .BIG_OSD(BIG_OSD)) mist_video(
 	.clk_sys        ( clock27           ),
 	.SPI_SCK        ( SPI_SCK          ),
 	.SPI_SS3        ( SPI_SS3          ),
 	.SPI_DI         ( SPI_DI           ),
-	.R              ( vgared[7:2]     ),
-	.G              ( vgagreen[7:2]     ),
-	.B              ( vgablue[7:2]     ),
+	.R              ( vgared           ),
+	.G              ( vgagreen         ),
+	.B              ( vgablue          ),
 	.HSync          ( hsync 		     ),
 	.VSync          ( vsync     		  ),
 	.VGA_R          ( VGA_R            ),
@@ -973,19 +585,7 @@ mist_video #(.COLOR_DEPTH(6), .SD_HCNT_WIDTH(10), .OUT_COLOR_DEPTH(VGA_BITS), .B
 wire [12:0] zxn_audio_L_pre;
 wire [12:0] zxn_audio_R_pre;
 
-//dac #(.C_bits(13))dac_l(
-//	.clk_i(clk_28),
-//	.res_n_i(1'b1),
-//	.dac_i(zxn_audio_L_pre),
-//	.dac_o(AUDIO_L)
-//	);
-//
-//dac #(.C_bits(13))dac_r(
-//	.clk_i(clk_28),
-//	.res_n_i(1'b1),
-//	.dac_i(zxn_audio_R_pre),
-//	.dac_o(AUDIO_R)
-//	);
+
 
 `ifdef I2S_AUDIO
 //mist_i2s_master i2s (
@@ -1038,7 +638,7 @@ i2c_master #(28_000_000) i2c_master (
 	.I2C_SDA     (HDMI_SDA)
 );
 
-mist_video #(.COLOR_DEPTH(3), .SD_HCNT_WIDTH(10), .OUT_COLOR_DEPTH(8), .BIG_OSD(BIG_OSD), .USE_BLANKS(1'b1), .VIDEO_CLEANER(1'b1)) hdmi_video(
+mist_video #(.COLOR_DEPTH(3), .SD_HCNT_WIDTH(10), .OUT_COLOR_DEPTH(6), .BIG_OSD(BIG_OSD), .USE_BLANKS(1'b1), .VIDEO_CLEANER(1'b1)) hdmi_video(
 	.clk_sys        ( clock27           ),
 	.SPI_SCK        ( SPI_SCK          ),
 	.SPI_SS3        ( SPI_SS3          ),
@@ -1069,26 +669,6 @@ assign HDMI_PCLK = clk_28;
 
 `endif
 
-// RTC
-//wire zxn_i2c_scl_n_i;
-//wire zxn_i2c_sda_n_i;
-//
-//wire zxn_i2c_scl_n_o;
-//wire zxn_i2c_sda_n_o;
-
-//i2cSlaveTop DS1307 (
-//	.clk            ( clock27          ),
-//	.rst            ( ~pll_locked     ),
-//	.sdaIn          ( zxn_i2c_sda_n_o ),
-//	.sdaOut         ( zxn_i2c_sda_n_i ),
-//	.scl            ( zxn_i2c_scl_n_o ),
-//	.we             ( 1'b0            ),
-//	.rd             ( 1'b0            ),
-//	.addr           (  ),
-//	.din            (  ),
-//	.dout           (  ),
-//	.RTC            ( rtc             )
-//);
 
 // Userport
 wire        zxn_uart0_rx;
