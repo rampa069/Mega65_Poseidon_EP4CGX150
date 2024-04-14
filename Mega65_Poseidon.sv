@@ -305,7 +305,7 @@ user_io #(.STRLEN(($size(CONF_STR)>>3)), .SD_IMAGES(2),.ROM_DIRECT_UPLOAD(DIRECT
 	.sd_wr      	  ( sd_wr          ),
 	.sd_ack     	  ( sd_ack         ),
 	.sd_conf    	  ( sd_conf        ),
-	.sd_sdhc    	  ( sd_sdhc        ),
+	.sd_sdhc    	  ( 1        ),
 	.sd_dout    	  ( sd_dout        ),
 	.sd_dout_strobe ( sd_dout_strobe ),
 	.sd_din     	  ( sd_din         ),
@@ -338,12 +338,14 @@ wire        zxn_joy_io_mode_en;
 
 assign sd_lba = sd_cs_n? sd_lba1 : sd_lba0;
 assign sd_din = sd_cs_n? sd_din1 : sd_din0;
-
+assign sd_conf = sd_cs_n? sd_conf1 : sd_conf0;
 
 wire [31:0] sd_lba0;
 wire [31:0] sd_lba1;
 wire  [7:0] sd_din0;
 wire  [7:0] sd_din1;
+wire sd_conf0;
+wire sd_conf1;
 
 wire sd_cs_n;
 wire sd_sck;
@@ -360,8 +362,8 @@ sd_card sd_card (
 	.sd_wr        ( sd_wr[0]       ),
 	.sd_ack       ( sd_ack         ),
 	.sd_ack_conf  ( sd_ack_conf    ),
-	.sd_conf      ( sd_conf        ),
-	.sd_sdhc      ( sd_sdhc        ),
+	.sd_conf      ( sd_conf0        ),
+	.sd_sdhc      (                ),
 	.sd_buff_dout ( sd_dout        ),
 	.sd_buff_wr   ( sd_dout_strobe ),
 	.sd_buff_din  ( sd_din0         ),
@@ -391,8 +393,8 @@ sd_card sd_card2 (
 	.sd_wr        ( sd_wr[1]       ),
 	.sd_ack       ( sd_ack         ),
 	.sd_ack_conf  ( sd_ack_conf    ),
-	.sd_conf      ( sd_conf        ),
-	.sd_sdhc      ( sd_sdhc        ),
+	.sd_conf      ( sd_conf1       ),
+	.sd_sdhc      (                ),
 	.sd_buff_dout ( sd_dout        ),
 	.sd_buff_wr   ( sd_dout_strobe ),
 	.sd_buff_din  ( sd_din1         ),
