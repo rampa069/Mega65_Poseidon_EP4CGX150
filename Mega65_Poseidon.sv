@@ -165,7 +165,6 @@ wire        invtapein = status[8];
 
 //assign 		LED = ~ioctl_downl & (tzxplayer_pause | tape_motor_led);
 assign 		LED = ~ioctl_downl;
-assign 		SDRAM_CKE = 1;
 
 // Clock generation
 //wire sdclk, clk_112, clk_28, clk_28n = ~clk_28, clk_14, clk_7, pll_locked;
@@ -337,17 +336,21 @@ wire  [2:0] zxn_joy_left_type;
 wire  [2:0] zxn_joy_right_type;
 wire        zxn_joy_io_mode_en;
 
-// SD Card
-wire zxn_spi_ss_sd0_n;
-wire zxn_spi_sck;
-wire zxn_spi_mosi;
-wire sd_miso_i;
+assign sd_lba = sd_cs_n? sd_lba1 : sd_lba0;
+assign sd_din = sd_cs_n? sd_din1 : sd_din0;
 
+
+wire [31:0] sd_lba0;
+wire [31:0] sd_lba1;
+wire  [7:0] sd_din0;
+wire  [7:0] sd_din1;
 
 wire sd_cs_n;
 wire sd_sck;
 wire sd_mosi;
 wire sd_miso;
+
+
 	
 sd_card sd_card (
 	// connection to io controller
@@ -380,31 +383,31 @@ wire sd2_sck;
 wire sd2_mosi;
 wire sd2_miso;
 
-//sd_card sd_card2 (
-//	// connection to io controller
-//	.clk_sys      ( clock100       ),
-//	.sd_lba       ( sd_lba         ),
-//	.sd_rd        ( sd_rd[1]       ),
-//	.sd_wr        ( sd_wr[1]       ),
-//	.sd_ack       ( sd_ack         ),
-//	.sd_ack_conf  ( sd_ack_conf    ),
-//	.sd_conf      ( sd_conf        ),
-//	.sd_sdhc      ( sd_sdhc        ),
-//	.sd_buff_dout ( sd_dout        ),
-//	.sd_buff_wr   ( sd_dout_strobe ),
-//	.sd_buff_din  ( sd_din         ),
-//	.sd_buff_addr ( sd_buff_addr   ),
-//	.img_mounted  ( img_mounted[1] ),
-//	.img_size     ( img_size       ),
-//	.allow_sdhc   ( 1'b1           ),
-//	.sd_busy      ( sd_busy        ),
-//
-//	// connection to local CPU
-//	.sd_cs        ( sd2_cs_n ),
-//	.sd_sck       ( sd2_sck  ),
-//	.sd_sdi       ( sd2_mosi ),
-//	.sd_sdo       ( sd2_miso )
-//);
+sd_card sd_card2 (
+	// connection to io controller
+	.clk_sys      ( clock100       ),
+	.sd_lba       ( sd_lba         ),
+	.sd_rd        ( sd_rd[1]       ),
+	.sd_wr        ( sd_wr[1]       ),
+	.sd_ack       ( sd_ack         ),
+	.sd_ack_conf  ( sd_ack_conf    ),
+	.sd_conf      ( sd_conf        ),
+	.sd_sdhc      ( sd_sdhc        ),
+	.sd_buff_dout ( sd_dout        ),
+	.sd_buff_wr   ( sd_dout_strobe ),
+	.sd_buff_din  ( sd_din         ),
+	.sd_buff_addr ( sd_buff_addr   ),
+	.img_mounted  ( img_mounted[1] ),
+	.img_size     ( img_size       ),
+	.allow_sdhc   ( 1'b1           ),
+	.sd_busy      ( sd_busy        ),
+
+	// connection to local CPU
+	.sd_cs        ( sd2_cs_n ),
+	.sd_sck       ( sd2_sck  ),
+	.sd_sdi       ( sd2_mosi ),
+	.sd_sdo       ( sd2_miso )
+);
 
 // data io (TZX upload)
 wire        ioctl_downl;
